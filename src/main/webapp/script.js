@@ -4,6 +4,7 @@ $(function() {
   var ctx = document.getElementById("whiteboard").getContext('2d');
 
   function draw(data) {
+    console.log(data);
     switch (data.type) {
     case "stroke":
       ctx.beginPath();
@@ -20,6 +21,10 @@ $(function() {
       ctx.fillStyle = data.color;
       ctx.fillText(data.text, data.point[0], data.point[1]);
       break;
+    case "file":
+      var img = new Image();
+      img.src = data.data;
+      ctx.drawImage(img, data.point[0], data.point[1]);
     }
   }
 
@@ -60,6 +65,8 @@ $(function() {
     return $("input[name='type']:checked").val();
   }
 
+  var reader = new FileReader();
+
   var stroke;
   whiteboard.mousemove(function(e) {
     if (stroke && type() == "stroke") {
@@ -96,6 +103,21 @@ $(function() {
           font: ctx.font,
           point: p
         }));
+      case "image":
+        var p = point(e);
+        reader.onload = function(e) {
+          if (e.target.readyState == FileReader.DONE) { 
+            var img = new Image();
+            img.src = e.target.result;
+            ctx.drawImage(img, p[0], p[1]);
+            socket.push($.stringifyJSON({
+              type: "file",
+              data: e.target.result,
+              point: p
+            }));
+          }
+        }
+        reader.readAsDataURL(document.getElementById("file").files[0]);
     }
   }).mouseup(function(e) {
     if (type() == "stroke") {

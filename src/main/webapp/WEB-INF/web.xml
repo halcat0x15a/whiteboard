@@ -11,5 +11,9 @@
   -->
   <listener>
     <listener-class>org.scalatra.servlet.ScalatraListener</listener-class>
-  </listener>  
+  </listener>
+  <context-param>
+    <param-name>org.atmosphere.websocket.maxTextMessageSize</param-name>
+    <param-value>1000000</param-value>
+  </context-param>
 </web-app>
